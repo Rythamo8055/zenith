@@ -1,0 +1,25 @@
+
+{
+  "short_name": "Zenith",
+  "name": "Zenith - Meditation Timer",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1E1B4B", 
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#3B82F6",
+  "description": "A minimalistic meditation timer PWA with a calming glass liquid design."
+}
