@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A minimalist timer app to help you focus, breathe, and relax. Features customizable durations and optional chime sounds for a serene experience.",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && esbuild index.tsx --bundle --outfile=dist/index.js --jsx=automatic --format=esm --platform=browser --external:react --external:react-dom/client --external:react/jsx-runtime && cp index.html manifest.json metadata.json icon-192x192.png icon-512x512.png dist/",
+    "build": "rm -rf dist && mkdir -p dist && esbuild index.tsx --bundle --outfile=dist/index.js --jsx=automatic --format=esm --platform=browser --external:react --external:react-dom/client --external:react/jsx-runtime && cp index.html manifest.json metadata.json dist/",
+
     "start": "esbuild index.tsx --bundle --outfile=dist/index.js --jsx=automatic --format=esm --platform=browser --external:react --external:react-dom/client --external:react/jsx-runtime --servedir=dist --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
