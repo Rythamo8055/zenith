@@ -41,7 +41,7 @@ const App: React.FC = () => {
   
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [breathingGuidanceEnabled, setBreathingGuidanceEnabled] = useState<boolean>(true);
-  const [ambientSoundEnabled, setAmbientSoundEnabled] = useState<boolean>(true);
+  const [ambientSoundEnabled, setAmbientSoundEnabled] = useState<boolean>(false); // Changed to false
 
   const [currentBreathingPhase, setCurrentBreathingPhase] = useState<BreathingPhase>(BreathingPhase.IDLE);
   const [timeInPhase, setTimeInPhase] = useState<number>(0);

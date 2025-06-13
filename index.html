@@ -13,12 +13,6 @@
     <meta name="theme-color" content="#3B82F6">
     <link rel="apple-touch-icon" href="/icon-192x192.png">
     <style>
-      @keyframes animateGradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-
       body {
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
@@ -28,10 +22,9 @@
         justify-content: center;
         overflow-x: hidden; /* Prevent horizontal scroll */
         
-        /* Dynamic Calming Background */
-        background: linear-gradient(-45deg, #64C9B1, #59A7D4, #9B86CF, #B075CC);
-        background-size: 400% 400%;
-        animation: animateGradient 25s ease infinite;
+        /* New Calming Static Background */
+        background-color: #1a202c; /* Fallback */
+        background-image: radial-gradient(ellipse at center, #2c3e50 0%, #1a202c 100%);
       }
       /* Custom scrollbar for a more polished look if content overflows */
       ::-webkit-scrollbar {
@@ -51,19 +44,19 @@
       }
       /* Define the glassmorphism background utility class */
       .glass-bg {
-        background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px); /* For Safari */
+        background: rgba(255, 255, 255, 0.07); /* Slightly adjusted for new background */
+        backdrop-filter: blur(10px); /* Slightly reduced blur */
+        -webkit-backdrop-filter: blur(10px); /* For Safari */
         /* Rounded corners are applied by Tailwind's rounded-* classes */
         /* Border is applied by Tailwind's border-* classes */
         /* Box shadow is applied by Tailwind's shadow-* classes */
       }
       #root {
         width: 100%;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        min-height: 100vh; /* Ensure root takes full viewport height */
+        display: flex; /* Enable flexbox for centering */
+        align-items: center; /* Vertical centering */
+        justify-content: center; /* Horizontal centering */
       }
     </style>
 <script type="importmap">
