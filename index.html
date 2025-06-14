@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,10 +8,77 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#3B82F6">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+
     <style>
+      :root { /* Dark Theme Defaults */
+        --bg-primary: #1a202c;
+        --bg-gradient-start: #2c3e50;
+        --bg-gradient-end: #1a202c;
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.75);
+        --text-tertiary: rgba(255, 255, 255, 0.6);
+        --text-disabled: rgba(255, 255, 255, 0.5);
+        
+        --glass-bg-color: rgba(255, 255, 255, 0.07);
+        --glass-border-color: rgba(255, 255, 255, 0.2);
+        
+        --button-hover-bg: rgba(255, 255, 255, 0.15);
+        --button-focus-ring: rgba(255, 255, 255, 0.5);
+
+        --button-secondary-bg: rgba(255, 255, 255, 0.1);
+        --button-secondary-hover-bg: rgba(255, 255, 255, 0.2);
+
+        --button-main-bg: rgba(255, 255, 255, 0.2);
+        --button-main-hover-bg: rgba(255, 255, 255, 0.3);
+        
+        --accent-color: #3B82F6; /* blue-500 */
+        --accent-color-hover: #2563EB; /* blue-600 */
+        --accent-selected-bg: rgba(59, 130, 246, 0.7); /* blue-500/70 */
+        --accent-selected-ring: #60A5FA; /* blue-400 */
+
+        --icon-green: #34D399; /* green-400 */
+        --icon-red: #F87171; /* red-400 */
+        --backdrop-color: rgba(0, 0, 0, 0.7);
+        --modal-content-bg: var(--glass-bg-color); /* For modal content specifically if different from general glass */
+      }
+
+      html.light {
+        --bg-primary: #F3F4F6; /* gray-100 */
+        --bg-gradient-start: #E5E7EB; /* gray-200 */
+        --bg-gradient-end: #F9FAFB; /* gray-50 */
+        --text-primary: #111827; /* gray-900 */
+        --text-secondary: #374151; /* gray-700 */
+        --text-tertiary: #6B7280; /* gray-500 */
+        --text-disabled: #9CA3AF; /* gray-400 */
+        
+        --glass-bg-color: rgba(255, 255, 255, 0.7);
+        --glass-border-color: rgba(0, 0, 0, 0.08);
+        
+        --button-hover-bg: rgba(0, 0, 0, 0.05);
+        --button-focus-ring: rgba(0, 0, 0, 0.2);
+
+        --button-secondary-bg: rgba(249, 250, 251, 0.8); /* Was 0,0,0,0.03 - using a lighter distinct bg */
+        --button-secondary-hover-bg: rgba(229, 231, 235, 0.9); /* Was 0,0,0,0.07 - using a lighter distinct bg */
+
+        --button-main-bg: rgba(229, 231, 235, 0.9); /* Was 0,0,0,0.05 */
+        --button-main-hover-bg: rgba(209, 213, 219, 0.9); /* Was 0,0,0,0.1 */
+        
+        --accent-color: #2563EB; /* blue-600 */
+        --accent-color-hover: #1D4ED8; /* blue-700 */
+        --accent-selected-bg: rgba(59, 130, 246, 0.3); /* Lighter blue for selection against light bg */
+        --accent-selected-ring: #3B82F6; /* blue-500 */
+
+        --icon-green: #059669; /* green-600 */
+        --icon-red: #DC2626; /* red-600 */
+        --backdrop-color: rgba(0, 0, 0, 0.2); /* Lighter backdrop for light mode */
+        --modal-content-bg: rgba(255, 255, 255, 0.85); /* More opaque for light mode modal content */
+      }
+
       body {
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
@@ -20,43 +86,59 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow-x: hidden; /* Prevent horizontal scroll */
+        overflow-x: hidden;
         
-        /* New Calming Static Background */
-        background-color: #1a202c; /* Fallback */
-        background-image: radial-gradient(ellipse at center, #2c3e50 0%, #1a202c 100%);
+        background-color: var(--bg-primary);
+        background-image: radial-gradient(ellipse at center, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
-      /* Custom scrollbar for a more polished look if content overflows */
+      
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(128, 128, 128, 0.1); /* Adjusted for theme neutrality */
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(128, 128, 128, 0.3); /* Adjusted for theme neutrality */
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(128, 128, 128, 0.4); /* Adjusted for theme neutrality */
       }
-      /* Define the glassmorphism background utility class */
+      
       .glass-bg {
-        background: rgba(255, 255, 255, 0.07); /* Slightly adjusted for new background */
-        backdrop-filter: blur(10px); /* Slightly reduced blur */
-        -webkit-backdrop-filter: blur(10px); /* For Safari */
-        /* Rounded corners are applied by Tailwind's rounded-* classes */
-        /* Border is applied by Tailwind's border-* classes */
-        /* Box shadow is applied by Tailwind's shadow-* classes */
+        background: var(--glass-bg-color);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border-color);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
       }
+
+      html.light .glass-bg { /* Specific override for modal content in light theme */
+        background: var(--modal-content-bg); /* This applies to all glass-bg, careful if general glass needs different bg */
+      }
+      
       #root {
         width: 100%;
-        min-height: 100vh; /* Ensure root takes full viewport height */
-        display: flex; /* Enable flexbox for centering */
-        align-items: center; /* Vertical centering */
-        justify-content: center; /* Horizontal centering */
+        min-height: 100vh; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem; /* Added padding for smaller screens */
+      }
+      @media (min-width: 640px) { /* sm */
+        #root {
+          padding: 1.5rem;
+        }
+      }
+      @media (min-width: 768px) { /* md */
+        #root {
+          padding: 2rem;
+        }
       }
     </style>
 <script type="importmap">

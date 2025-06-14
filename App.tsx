@@ -31,7 +31,9 @@ const BREATHING_CYCLE: BreathingCycleConfig = {
   [BreathingPhase.IDLE]: { duration: 0, next: BreathingPhase.IDLE, sound: '', text: ''}
 };
 
-const AMBIENT_NOISE_VOLUME = 0.015; // Adjusted for white noise
+const AMBIENT_NOISE_VOLUME = 0.015;
+
+export type Theme = 'light' | 'dark'; // Simplified Theme type
 
 const App: React.FC = () => {
   const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
@@ -41,16 +43,33 @@ const App: React.FC = () => {
   
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [breathingGuidanceEnabled, setBreathingGuidanceEnabled] = useState<boolean>(true);
-  const [ambientSoundEnabled, setAmbientSoundEnabled] = useState<boolean>(false); // Changed to false
+  const [ambientSoundEnabled, setAmbientSoundEnabled] = useState<boolean>(false);
 
   const [currentBreathingPhase, setCurrentBreathingPhase] = useState<BreathingPhase>(BreathingPhase.IDLE);
   const [timeInPhase, setTimeInPhase] = useState<number>(0);
 
-  const timerRef = useRef<number | null>(null); // Changed NodeJS.Timeout to number
+  const [theme, setTheme] = useState<Theme>(() => {
+    let storedThemeValue = localStorage.getItem('theme');
+    if (storedThemeValue === 'system') { // Handle legacy 'system' value
+      storedThemeValue = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    // Ensure it's one of the valid new Theme types, default to 'light'
+    if (storedThemeValue === 'dark') {
+      return 'dark';
+    }
+    return 'light'; // Default to light if not 'dark' or if null/invalid
+  });
+
+  const timerRef = useRef<number | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   
   const ambientSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const ambientGainNodeRef = useRef<GainNode | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.className = theme;
+  }, [theme]);
 
   const getAudioContext = useCallback((): AudioContext | null => {
     if (typeof window !== 'undefined') {
@@ -144,11 +163,10 @@ const App: React.FC = () => {
       context.resume().catch(err => console.warn("[Audio] Error resuming context for ambient noise:", err));
     }
 
-    const bufferSize = 2 * context.sampleRate; // 2 seconds of audio buffer
+    const bufferSize = 2 * context.sampleRate;
     const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
     const output = buffer.getChannelData(0);
     
-    // Generate White Noise
     for (let i = 0; i < bufferSize; i++) {
         output[i] = Math.random() * 2 - 1; 
     }
@@ -169,7 +187,7 @@ const App: React.FC = () => {
   }, [getAudioContext, soundEnabled, ambientSoundEnabled, stopAmbientNoise]);
 
   useEffect(() => {
-    getAudioContext(); // Initialize on mount
+    getAudioContext();
     return () => { 
       if (timerRef.current) clearInterval(timerRef.current);
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -182,7 +200,7 @@ const App: React.FC = () => {
       if (soundEnabled && ambientSoundEnabled && !ambientSourceNodeRef.current) {
         playAmbientNoise();
       }
-      timerRef.current = window.setInterval(() => { // Using window.setInterval for clarity
+      timerRef.current = window.setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -229,7 +247,6 @@ const App: React.FC = () => {
            window.speechSynthesis.cancel(); 
          }
       }
-      // For PAUSED state, ambient noise is handled by handleStartPause
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -250,7 +267,7 @@ const App: React.FC = () => {
 
     if (timerState === TimerState.RUNNING) {
       setTimerState(TimerState.PAUSED);
-      stopAmbientNoise(); // Stop ambient noise when pausing
+      stopAmbientNoise(); 
     } else { 
       if (timerState === TimerState.IDLE || timerState === TimerState.FINISHED) {
         setTimeLeft(duration); 
@@ -265,11 +282,11 @@ const App: React.FC = () => {
           setCurrentBreathingPhase(BreathingPhase.IDLE);
         }
       } else if (timerState === TimerState.PAUSED) { 
-         if (soundEnabled && ambientSoundEnabled) { // Check if it *should* play
-            playAmbientNoise(); // Restart ambient noise when resuming
+         if (soundEnabled && ambientSoundEnabled) {
+            playAmbientNoise();
          }
          if (breathingGuidanceEnabled && currentBreathingPhase === BreathingPhase.IDLE) {
-            setCurrentBreathingPhase(BreathingPhase.IN); // Resume breathing phase
+            setCurrentBreathingPhase(BreathingPhase.IN);
             setTimeInPhase(0);
             if (soundEnabled && BREATHING_CYCLE[BreathingPhase.IN]?.sound) playSound(BREATHING_CYCLE[BreathingPhase.IN].sound);
          }
@@ -307,7 +324,6 @@ const App: React.FC = () => {
         stopAmbientNoise(); 
     } else {
         if (ambientSoundEnabled && (timerState === TimerState.RUNNING || timerState === TimerState.PAUSED)) {
-             // If resuming from PAUSED and master sound is re-enabled, ambient should play if it was on
             if(timerState === TimerState.RUNNING || (timerState === TimerState.PAUSED && ambientSourceNodeRef.current === null)){
                  playAmbientNoise();
             }
@@ -352,10 +368,10 @@ const App: React.FC = () => {
     : '';
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full p-4 text-white">
-      <main className="flex flex-col items-center justify-center p-5 sm:p-6 md:p-10 glass-bg rounded-3xl shadow-2xl border border-white/20 max-w-md sm:max-w-lg w-full text-center">
-        <h1 className="text-3xl sm:text-4xl font-semibold mb-1 sm:mb-2">Zenith</h1>
-        <p className="text-sm sm:text-base text-white/70 mb-4 sm:mb-6 md:mb-8">Focus. Breathe. Relax.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen w-full text-[var(--text-primary)]">
+      <main className="flex flex-col items-center justify-center p-5 sm:p-6 md:p-10 glass-bg rounded-3xl shadow-2xl max-w-md sm:max-w-lg w-full text-center">
+        <h1 className="text-3xl sm:text-4xl font-semibold mb-1 sm:mb-2 text-[var(--text-primary)]">Zenith</h1>
+        <p className="text-sm sm:text-base text-[var(--text-secondary)] mb-6 sm:mb-8 md:mb-10">Focus. Breathe. Relax.</p>
         
         <TimerDisplay 
           timeLeft={timeLeft} 
@@ -379,18 +395,18 @@ const App: React.FC = () => {
               setShowSettings(true);
           }}
           aria-label="Open settings"
-          className="mt-6 sm:mt-8 px-6 py-3 rounded-full glass-bg border border-white/20 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200 ease-in-out flex items-center space-x-2 text-sm sm:text-base"
+          className="mt-8 sm:mt-10 px-6 py-3 rounded-full glass-bg hover:bg-[var(--button-hover-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--button-focus-ring)] transition-all duration-200 ease-in-out flex items-center space-x-2 text-sm sm:text-base"
         >
-          <SettingsIcon className="w-5 h-5 text-white" />
-          <span className="text-white">Settings</span>
+          <SettingsIcon className="w-5 h-5 text-[var(--text-primary)]" />
+          <span className="text-[var(--text-primary)]">Settings</span>
         </button>
       </main>
       
-      <footer className="mt-4 sm:mt-6 md:mt-8 text-center max-w-lg w-full px-4">
-        <p className="text-xs text-white/60">
+      <footer className="mt-8 sm:mt-10 md:mt-12 text-center max-w-lg w-full px-4">
+        <p className="text-xs text-[var(--text-tertiary)]">
           Please ensure sound is enabled on your device.
         </p>
-        <p className="text-xs text-white/50 mt-1">
+        <p className="text-xs text-[var(--text-tertiary)] opacity-80 mt-1">
           Tip: Add to Home Screen for a native app feel.
         </p>
       </footer>
@@ -407,6 +423,8 @@ const App: React.FC = () => {
         onBreathingGuidanceToggle={handleBreathingGuidanceToggle}
         ambientSoundEnabled={ambientSoundEnabled}
         onAmbientSoundToggle={handleAmbientSoundToggle}
+        currentTheme={theme}
+        onThemeChange={setTheme}
       />
     </div>
   );
